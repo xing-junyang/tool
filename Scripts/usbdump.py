@@ -219,7 +219,7 @@ def get_controllers():
             continue
 
         # root
-        controller_info = {
+        base_info = {
             "name": controller["UsbDeviceProperties"]["DeviceDesc"],
             "identifiers": {
                 "instance_id": controller["UsbDeviceProperties"]["DeviceId"],
@@ -227,7 +227,9 @@ def get_controllers():
             },
             # "port_count_no3": controller["ControllerInfo"]["NumberOfRootPorts"],
             "class": "",
-        } | serialize_hub(controller["RootHub"])
+        }
+        hub_info = serialize_hub(controller["RootHub"])
+        controller_info = {**base_info, **hub_info}
 
         if all(controller[i] not in [0, int("0xFFFF", 16)] for i in ["VendorID", "DeviceID"]):
             controller_info["identifiers"]["pci_id"] = [hex(controller[i])[2:] for i in ["VendorID", "DeviceID"]]
