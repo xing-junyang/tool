@@ -4,7 +4,7 @@ import os
 import sys
 import time
 from sys import exit
-from typing import Callable, Optional, Union
+from typing import Callable, Optional, Union, List
 import ansiescapes
 
 if os.name == "nt":
@@ -129,7 +129,7 @@ class TUIMenu:
         return_number: bool = False,
         add_quit: bool = True,
         auto_number: bool = False,
-        in_between: Optional[Union[list, Callable]] = None,
+        in_between: Optional[Union[List[str], Callable]] = None,
         top_level: bool = False,
         loop: bool = False,
     ):
@@ -146,7 +146,7 @@ class TUIMenu:
 
         self.return_option = (["Q", "Quit"] if self.top_level else ["B", "Back"]) if self.add_quit else None
 
-    def add_menu_option(self, name: Union[str, Callable], description: Optional[list[str]] = None, function: Optional[Callable] = None, key: Optional[str] = None):
+    def add_menu_option(self, name: Union[str, Callable], description: Optional[List[str]] = None, function: Optional[Callable] = None, key: Optional[str] = None):
         if not key and not self.auto_number:
             raise TypeError("Key must be specified if auto_number is false")
         self.options.append([key, name, description or [], function])
