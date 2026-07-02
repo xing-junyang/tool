@@ -42,7 +42,7 @@ class BaseUSBMap:
         self.settings_path = shared.current_dir / Path("settings.json")
 
         self.settings = (
-            json.load(self.settings_path.open()) if self.settings_path.exists() else {"show_friendly_types": True, "use_native": False, "use_legacy_native": False, "add_comments_to_map": True, "auto_bind_companions": True}
+            json.load(self.settings_path.open()) if self.settings_path.exists() else {"show_friendly_types": True, "use_native": False, "use_legacy_native": False, "add_comments_to_map": True, "auto_b[...]
         )
         self.controllers_historical = json.load(self.json_path.open("r")) if self.json_path.exists() else None
 
@@ -502,7 +502,10 @@ class BaseUSBMap:
         elif self.check_unique(lambda c: c["identifiers"]["pci_id"], lambda c: "pci_id" in c["identifiers"], controller):
             # Use PCI ID
             pci_id: list[str] = controller["identifiers"]["pci_id"]
-            return {"IOPCIPrimaryMatch": f"0x{pci_id[1]}{pci_id[0]}"} | ({"IOPCISecondaryMatch": f"0x{pci_id[3]}{pci_id[2]}"} if len(pci_id) > 2 else {})
+            secondary = {"IOPCISecondaryMatch": f"0x{pci_id[3]}{pci_id[2]}"} if len(pci_id) > 2 else {}
+            result = {"IOPCIPrimaryMatch": f"0x{pci_id[1]}{pci_id[0]}"}
+            result.update(secondary)
+            return result
 
         else:
             raise RuntimeError("No matching key available")
@@ -578,9 +581,8 @@ class BaseUSBMap:
                     "IOClass": "USBToolBox",
                     "IOProviderClass": "IOPCIDevice",
                     "IOMatchCategory": "USBToolBox",
-                } | self.choose_matching_key(
-                    controller
-                )  # type: ignore
+                }
+                personality.update(self.choose_matching_key(controller))
 
             personality["IOProviderMergeProperties"] = {"ports": {}, "port-count": None}
 
